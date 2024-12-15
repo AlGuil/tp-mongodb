@@ -40,66 +40,67 @@ services:
            - ./www:/var/www/app/
         networks:
             - local
-#    tpmongo-redis:
-#        container_name: "tpmongo-redis"
-#        image: redis:7.0.5
-#        ports:
-#            - 6379:6379
-#        networks:
-#            - local
-#    tpmongo-redis-commander:
-#        container_name: "tpmongo-redis-commander"
-#        image: rediscommander/redis-commander:latest
-#        depends_on:
-#            -   tpmongo-redis
-#        ports:
-#            - 8081:8081
-#        environment:
-#            - REDIS_HOSTS=local:tpmongo-redis:6379
-#        networks:
-#            - local
-#    tpmongo-influxdb:
-#        container_name: "tpmongo-influxdb"
-#        image: influxdb:1.8
-#        ports:
-#            - "8086:8086"
-#        environment:
-#            - INFLUXDB_DB=k6
-#        networks:
-#            - local
-#    tpmongo-grafana:
-#        container_name: "tpmongo-grafana"
-#        image: grafana/grafana:latest
-#        depends_on:
-#            -   tpmongo-influxdb
-#        ports:
-#            - "3000:3000"
-#        environment:
-#            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-#            - GF_AUTH_ANONYMOUS_ENABLED=true
-#            - GF_AUTH_BASIC_ENABLED=false
-#        volumes:
-#            - ./grafana/dashboards:/var/lib/grafana/dashboards
-#            - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
-#            - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-#        networks:
-#            - local
-#    tpmongo-k6:
-#        container_name: "tpmongo-k6"
-#        image: loadimpact/k6:latest
-#        depends_on:
-#            - tpmongo-php
-#            - tpmongo-influxdb
-##        entrypoint: /bin/sh
-##        user: root
-#        ports:
-#            - "6565:6565"
-#        environment:
-#            - K6_OUT=influxdb=http://influxdb:8086/k6
-#        volumes:
-#            - ./k6:/scripts
-#        networks:
-#            - local
+    tpmongo-redis:
+        container_name: "tpmongo-redis"
+        image: redis:7.0.5
+        ports:
+            - 6379:6379
+        networks:
+            - local
+    tpmongo-redis-commander:
+        container_name: "tpmongo-redis-commander"
+        image: rediscommander/redis-commander:latest
+        depends_on:
+            -   tpmongo-redis
+        ports:
+            - 8081:8081
+        environment:
+            - REDIS_HOSTS=local:tpmongo-redis:6379
+        networks:
+            - local
+    tpmongo-influxdb:
+        container_name: "tpmongo-influxdb"
+        image: influxdb:1.8
+        ports:
+            - "8086:8086"
+        environment:
+            - INFLUXDB_DB=k6
+        networks:
+            - local
+    tpmongo-grafana:
+        container_name: "tpmongo-grafana"
+        image: grafana/grafana:latest
+        depends_on:
+            -   tpmongo-influxdb
+        ports:
+            - "3000:3000"
+        environment:
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_BASIC_ENABLED=false
+        volumes:
+            - ./grafana/dashboards:/var/lib/grafana/dashboards
+            - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+            - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+        networks:
+            - local
+    tpmongo-k6:
+        container_name: "tpmongo-k6"
+        platform: linux/amd64
+        image: grafana/k6:latest
+        depends_on:
+            - tpmongo-php
+            - tpmongo-influxdb
+        entrypoint: ["k6", "run", "/scripts/load_test.js"]
+        user: root
+        ports:
+            - "6565:6565"
+        environment:
+            - K6_OUT=influxdb=http://tpmongo-influxdb:8086/k6
+        volumes:
+            - ./k6:/scripts
+        networks:
+           - local
     tpmongo-elasticsearch:
         image: elasticsearch:8.12.2
         container_name: tpmongo-elasticsearch

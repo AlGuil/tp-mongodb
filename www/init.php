@@ -25,3 +25,16 @@ function getMongoDbManager(): Database
     return $client->selectDatabase($_ENV['MDB_DB']);
 }
 
+function getRedisClient(): Client
+{
+    // Vérifier si Redis est activé dans le fichier .env
+    if ($_ENV['REDIS_ENABLE'] === 'true') {
+        return new Client([
+            'scheme' => 'tcp',
+            'host'   => $_ENV['REDIS_HOST'],
+            'port'   => $_ENV['REDIS_PORT'],
+        ]);
+    }
+
+    return null;
+}

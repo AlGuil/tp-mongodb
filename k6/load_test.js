@@ -1,27 +1,54 @@
 import http from 'k6/http';
-import { check } from "k6";
+import { check } from 'k6';
 
 export let options = {
     stages: [
-        // Ramp-up from 1 to 5 VUs in 5s
         { duration: "5s", target: 5 },
-        // 10 VUs for 10s
         { duration: "10s", target: 10 },
-        // 50 VUs for 10s
         { duration: "10s", target: 50 },
-        // Ramp-down from 50 to 100 VUs for 5s
         { duration: "5s", target: 10 },
-        // Ramp-down from 5 to 0 VUs for 5s
         { duration: "5s", target: 5 }
     ]
 };
+
 export default function () {
-    var response = http.get("http://php:80/", {headers: {Accepts: "application/json"}});
+    // 1. Affichage de la liste des livres
+    let response = http.get("http://tpmongo-php:80/");
     check(response, { "status is 200": (r) => r.status === 200 });
 
-    var response = http.get("http://php:80?page=30/", {headers: {Accepts: "application/json"}});
+    // 2. Affichage de la page 30
+    response = http.get("http://tpmongo-php:80?page=30/");
     check(response, { "status is 200": (r) => r.status === 200 });
 
-    var response = http.get("http://php:80/", {headers: {Accepts: "application/json"}});
+    // 3. Consultation des détails d'un livre (en supposant que vous avez un livre avec ID=1)
+    let bookId = 1; // Remplacer par un ID valide de livre
+    response = http.get(`http://tpmongo-php:80/get.php?id=${bookId}`);
+    check(response, { "status is 200": (r) => r.status === 200 });
+
+    // 4. Retour à la liste des livres (simuler un clic de retour à la liste)
+    response = http.get("http://tpmongo-php:80/");
+    check(response, { "status is 200": (r) => r.status === 200 });
+
+    // 5. Suppression d'un livre (en supposant que vous avez un livre avec ID=1 à supprimer)
+    response = http.get(`http://tpmongo-php:80/delete.php?id=${bookId}`);
+    check(response, { "status is 200": (r) => r.status === 200 });
+
+    // 6. Ajout d'un livre via POST
+    let payload = {
+        title: "Nouveau Livre",
+        author: "Auteur Exemple",
+        century: "XXI",
+        edition: "Exemple",
+        language: "Français",
+        cote: "ABC123"
+    };
+    
+    response = http.post("http://tpmongo-php:80/create.php", payload, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    });
+    check(response, { "status is 200": (r) => r.status === 200 });
+
+    // 7. Consultation du livre ajouté
+    response = http.get("http://tpmongo-php:80/get.php?id=1"); // ID à mettre à jour selon l'ajout réel
     check(response, { "status is 200": (r) => r.status === 200 });
 };

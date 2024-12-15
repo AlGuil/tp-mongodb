@@ -1,22 +1,39 @@
 {% extends "base.html.twig" %}
 
 {% block title %}Index{% endblock %}
+
 {% block content %}
 <h1>Liste des manuscrits de la bibliothèque du Patrimoine de Clermont Auvergne Métropole</h1>
-<table>
-    <tr>
-        <th>Référence</th>
-        <th>Titre</th>
-        <th>Auteur</th>
-        <th>Actions</th>
-    </tr>
-    {% for document in list %}
-    <tr>
-        <td>{{ document.name }}</td>
-        <td>{{ document.name }}</td>
-        <td>{{ document.name }}</td>
-        <td><a href="get.php?id=1">voir</a>&nbsp;/&nbsp;<a href="edit.php?id=1">éditer</a>&nbsp;/&nbsp;<a href="delete.php?id=1">supprimer</a></td>
-    </tr>
-    {% endfor %}
+
+<!-- Lien pour ajouter un nouveau document -->
+<p><a href="create.php">Ajouter un nouveau manuscrit</a></p>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+        <tr>
+            <th>Référence</th>
+            <th>Titre</th>
+            <th>Auteur</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for document in list %}
+            <tr>
+                <td>{{ document._id }}</td>
+                <td>{{ document.titre }}</td>
+                <td>{{ document.auteur or 'Non spécifié' }}</td>
+                <td>
+                    <a href="get.php?id={{ document._id }}">Voir</a>&nbsp;/&nbsp;
+                    <a href="edit.php?id={{ document._id }}">Éditer</a>&nbsp;/&nbsp;
+                    <a href="delete.php?id={{ document._id }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">Aucun manuscrit trouvé</td>
+            </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

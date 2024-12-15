@@ -1,18 +1,29 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Création d'un livre{% endblock %}
+{% block title %}Création d'un manuscrit{% endblock %}
+
 {% block content %}
 <p>&larr;&nbsp;<a href="/index.php">Retourner à la liste</a></p>
+<h1>Ajouter un nouveau manuscrit</h1>
 <form action="/create.php" method="post">
-        <label for="title">Titre :</label>
-        <input type="text" id="title" name="title" size="100">
+    <label for="title">Titre :</label>
+    <input type="text" id="title" name="title" size="100" required>
 
-        <label for="author">Auteur :</label>
-        <input type="text" id="author" name="author" size="50">
+    <label for="author">Auteur :</label>
+    <input type="text" id="author" name="author" size="50">
 
-        <label for="century">Siècle :</label>
-        <input type="number" id="century" name="century">
+    <label for="century">Siècle :</label>
+    <input type="number" id="century" name="century">
 
-        <button type="submit">Ajouter</button>
+    <label for="edition">Édition :</label>
+    <input type="text" id="edition" name="edition">
+
+    <label for="language">Langue :</label>
+    <input type="text" id="language" name="language">
+
+    <label for="cote">Cote :</label>
+    <input type="text" id="cote" name="cote">
+
+    <button type="submit">Ajouter</button>
 </form>
 {% endblock %}
