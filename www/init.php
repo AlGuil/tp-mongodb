@@ -6,9 +6,11 @@ error_reporting(E_ALL);
 
 require_once __DIR__.'/vendor/autoload.php';
 
+
 use MongoDB\Database;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Elastic\Elasticsearch\ClientBuilder;
 
 // env configuration
 (Dotenv\Dotenv::createImmutable(__DIR__))->load();
@@ -25,16 +27,31 @@ function getMongoDbManager(): Database
     return $client->selectDatabase($_ENV['MDB_DB']);
 }
 
-function getRedisClient(): Client
+function getRedisClient()
 {
     // Vérifier si Redis est activé dans le fichier .env
     if ($_ENV['REDIS_ENABLE'] === 'true') {
-        return new Client([
-            'scheme' => 'tcp',
-            'host'   => $_ENV['REDIS_HOST'],
-            'port'   => $_ENV['REDIS_PORT'],
-        ]);
+        $redis = new Redis();
+        $redis->connect($_ENV['REDIS_HOST'], $_ENV['REDIS_PORT']);
+        return $redis;
     }
 
     return null;
+}
+
+
+function getElasticSearchClient()
+{
+    try {
+        // Crée une instance du client Elasticsearch avec les paramètres du fichier .env
+        $client = ClientBuilder::create()
+            ->setHosts([$_ENV['ELASTIC_HOST']])
+            ->build();
+
+        return $client;
+    } catch (\Exception $e) {
+        // Gestion des erreurs
+        error_log('ElasticSearch client error: ' . $e->getMessage());
+        return null;
+    }
 }

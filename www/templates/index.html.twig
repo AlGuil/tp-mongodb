@@ -5,8 +5,28 @@
 {% block content %}
 <h1>Liste des manuscrits de la bibliothèque du Patrimoine de Clermont Auvergne Métropole</h1>
 
+<form action="app.php" method="GET">
+    <input type="text" name="search" placeholder="Rechercher par titre ou auteur" value="{{ searchTerm }}" />
+    <button type="submit">Rechercher</button>
+</form>
+
+{% if list %}
+    <ul>
+    {% for book in list %}
+        <li>{{ book.titre }} - {{ book.auteur }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucun livre trouvé.</p>
+{% endif %}
+
+
 <!-- Lien pour ajouter un nouveau document -->
 <p><a href="create.php">Ajouter un nouveau manuscrit</a></p>
+
+{% if query %}
+    <p>Résultats pour : "<strong>{{ query }}</strong>"</p>
+{% endif %}
 
 <table border="1" cellspacing="0" cellpadding="5">
     <thead>
